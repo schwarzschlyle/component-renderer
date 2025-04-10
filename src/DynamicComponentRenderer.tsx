@@ -128,10 +128,8 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ cod
     setStatusMessage(null);
     
     try {
-      // Create mock libraries
-      const mockLibraries = createMockLibraries();
-      
-      // Process imports in the code
+      // We don't need to create mock libraries here since they're defined in the wrappedCode
+      // Just process imports in the code
       const processedCode = processImports(code);
       
       // Add debugging logs to check the processed code
