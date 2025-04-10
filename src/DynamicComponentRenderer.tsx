@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
 interface DynamicComponentRendererProps {
@@ -357,7 +357,8 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ cod
         )}
       </div>
 
-      <style jsx>{`
+      <style>
+        {`
         /* These styles are needed for animation, will be moved to App.css */
         @keyframes spin {
           0% { transform: rotate(0deg); }
@@ -447,7 +448,8 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ cod
           width: 100%;
           padding: 1rem;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
