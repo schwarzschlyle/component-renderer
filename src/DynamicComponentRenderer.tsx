@@ -1,5 +1,113 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+import { 
+  Box, 
+  Button, 
+  Typography, 
+  Paper, 
+  CircularProgress, 
+  Alert, 
+  AlertTitle, 
+  createTheme, 
+  ThemeProvider,
+  TextField,
+  Divider,
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  CardHeader,
+  CardActions,
+  Checkbox,
+  FormControl,
+  FormLabel,
+  InputLabel,
+  Select,
+  MenuItem,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  ListItemButton,
+  Fab,
+  IconButton,
+  Tabs,
+  Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  LinearProgress,
+  Chip,
+  Avatar,
+  Tooltip,
+  Switch
+} from '@mui/material';
+import CodeIcon from '@mui/icons-material/Code';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import SettingsIcon from '@mui/icons-material/Settings';
+import SearchIcon from '@mui/icons-material/Search';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import InfoIcon from '@mui/icons-material/Info';
+import WarningIcon from '@mui/icons-material/Warning';
+import ErrorIcon from '@mui/icons-material/Error';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PersonIcon from '@mui/icons-material/Person';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+
+// Create MUI dark theme for the rendered components
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#9c27b0',
+    },
+    error: {
+      main: '#d32f2f',
+    },
+    warning: {
+      main: '#ed6c02',
+    },
+    info: {
+      main: '#0288d1',
+    },
+    success: {
+      main: '#2e7d32',
+    },
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+    text: {
+      primary: '#fff',
+      secondary: 'rgba(255, 255, 255, 0.7)',
+    },
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+      },
+    },
+  },
+});
 
 interface DynamicComponentRendererProps {
   code: string;
@@ -11,9 +119,7 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ cod
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // The mock libraries are defined directly in the wrappedCode
-
-  // Create a function to handle imports and convert them to proper variables
+  // Process imports to handle them properly in the component code
   const processImports = (code: string) => {
     // Find all import statements
     const importRegexes = [
@@ -81,11 +187,10 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ cod
     setStatusMessage(null);
     
     try {
-      // We don't need to create mock libraries here since they're defined in the wrappedCode
-      // Just process imports in the code
+      // Process imports in the code
       const processedCode = processImports(code);
       
-      // Add debugging logs to check the processed code
+      // Add debugging logs
       console.log("Processed component code:", processedCode);
 
       // Wrap the processed code to ensure it returns the component
@@ -94,6 +199,9 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ cod
         const mockLibraries = {
           'react': React,
           'react-dom': ReactDOM,
+          // Material-UI mock library
+          '@mui/material': mui,
+          '@mui/icons-material': mui.icons,
           'lucide-react': {
             Clock: (props) => React.createElement('svg', {
               xmlns: "http://www.w3.org/2000/svg",
@@ -191,14 +299,12 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ cod
         try {
           ${processedCode}
           
-          // Try different ways to find the component
-          // First, check for common component names
-          if (typeof TimeLogger === 'function') {
-            return TimeLogger;
-          } else if (typeof SimpleCounter === 'function') {
-            return SimpleCounter;
+          // Look for the AIGeneratedWidget component first
+          if (typeof AIGeneratedWidget === 'function') {
+            return AIGeneratedWidget;
           }
           
+          // Try different ways to find the component
           // Look for any function that looks like a React component
           // It should start with uppercase letter
           const allVars = Object.getOwnPropertyNames(this);
@@ -223,21 +329,91 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ cod
             }
           }
           
-          throw new Error("No React component found in the code. Make sure your component is properly defined.");
+          throw new Error("No React component found in the code. Make sure your component is properly defined and exported as AIGeneratedWidget.");
         } catch (err) {
           console.error('Error in component code:', err);
           throw err;
         }
       `;
 
+      // Create ThemeProvider wrapper for nested use
+      const MuiThemeProvider = ({ children }) => 
+        React.createElement(ThemeProvider, { theme: darkTheme }, children);
+
       // Execute the wrapped code
-      const Component = new Function('React', 'ReactDOM', wrappedCode)(React, ReactDOM);
+      const Component = new Function('React', 'ReactDOM', 'mui', wrappedCode)(React, ReactDOM, {
+        // MUI ThemeProvider and styling
+        ThemeProvider: MuiThemeProvider,
+        createTheme: createTheme,
+        // Mock MUI components for the component to use
+        Button: ({ children, ...props }) => React.createElement(Button, props, children),
+        Box: ({ children, ...props }) => React.createElement(Box, props, children),
+        Paper: ({ children, ...props }) => React.createElement(Paper, props, children),
+        Typography: ({ children, ...props }) => React.createElement(Typography, props, children),
+        TextField: ({ ...props }) => React.createElement(TextField, props),
+        CircularProgress: ({ ...props }) => React.createElement(CircularProgress, props),
+        Alert: ({ children, ...props }) => React.createElement(Alert, props, children),
+        Divider: ({ ...props }) => React.createElement(Divider, props),
+        Container: ({ children, ...props }) => React.createElement(Container, props, children),
+        Grid: ({ children, ...props }) => React.createElement(Grid, props, children),
+        Card: ({ children, ...props }) => React.createElement(Card, props, children),
+        CardContent: ({ children, ...props }) => React.createElement(CardContent, props, children),
+        CardHeader: ({ ...props }) => React.createElement(CardHeader, props),
+        CardActions: ({ children, ...props }) => React.createElement(CardActions, props, children),
+        Checkbox: ({ ...props }) => React.createElement(Checkbox, props),
+        FormControl: ({ children, ...props }) => React.createElement(FormControl, props, children),
+        FormLabel: ({ children, ...props }) => React.createElement(FormLabel, props, children),
+        InputLabel: ({ children, ...props }) => React.createElement(InputLabel, props, children),
+        Select: ({ children, ...props }) => React.createElement(Select, props, children),
+        MenuItem: ({ children, ...props }) => React.createElement(MenuItem, props, children),
+        List: ({ children, ...props }) => React.createElement(List, props, children),
+        ListItem: ({ children, ...props }) => React.createElement(ListItem, props, children),
+        ListItemText: ({ ...props }) => React.createElement(ListItemText, props),
+        ListItemIcon: ({ children, ...props }) => React.createElement(ListItemIcon, props, children),
+        ListItemButton: ({ children, ...props }) => React.createElement(ListItemButton, props, children),
+        Fab: ({ children, ...props }) => React.createElement(Fab, props, children),
+        IconButton: ({ children, ...props }) => React.createElement(IconButton, props, children),
+        Tabs: ({ children, ...props }) => React.createElement(Tabs, props, children),
+        Tab: ({ ...props }) => React.createElement(Tab, props),
+        Dialog: ({ children, ...props }) => React.createElement(Dialog, props, children),
+        DialogTitle: ({ children, ...props }) => React.createElement(DialogTitle, props, children),
+        DialogContent: ({ children, ...props }) => React.createElement(DialogContent, props, children),
+        LinearProgress: ({ ...props }) => React.createElement(LinearProgress, props),
+        Chip: ({ ...props }) => React.createElement(Chip, props),
+        Avatar: ({ ...props }) => React.createElement(Avatar, props),
+        Tooltip: ({ children, ...props }) => React.createElement(Tooltip, props, children),
+        Switch: ({ ...props }) => React.createElement(Switch, props),
+        // Mock MUI icons
+        icons: {
+          Delete: ({ ...props }) => React.createElement(DeleteIcon, props),
+          Add: ({ ...props }) => React.createElement(AddIcon, props),
+          Check: ({ ...props }) => React.createElement(CheckIcon, props),
+          Close: ({ ...props }) => React.createElement(CloseIcon, props),
+          Edit: ({ ...props }) => React.createElement(EditIcon, props),
+          PlayArrow: ({ ...props }) => React.createElement(PlayArrowIcon, props),
+          Pause: ({ ...props }) => React.createElement(PauseIcon, props),
+          Refresh: ({ ...props }) => React.createElement(RefreshIcon, props),
+          Settings: ({ ...props }) => React.createElement(SettingsIcon, props),
+          Search: ({ ...props }) => React.createElement(SearchIcon, props),
+          Favorite: ({ ...props }) => React.createElement(FavoriteIcon, props),
+          FavoriteBorder: ({ ...props }) => React.createElement(FavoriteBorderIcon, props),
+          Star: ({ ...props }) => React.createElement(StarIcon, props),
+          StarBorder: ({ ...props }) => React.createElement(StarBorderIcon, props),
+          Info: ({ ...props }) => React.createElement(InfoIcon, props),
+          Warning: ({ ...props }) => React.createElement(WarningIcon, props),
+          Error: ({ ...props }) => React.createElement(ErrorIcon, props),
+          CheckCircle: ({ ...props }) => React.createElement(CheckCircleIcon, props),
+          Person: ({ ...props }) => React.createElement(PersonIcon, props),
+          ArrowUpward: ({ ...props }) => React.createElement(ArrowUpwardIcon, props),
+          ArrowDownward: ({ ...props }) => React.createElement(ArrowDownwardIcon, props)
+        }
+      });
 
       // Check if we got a valid component
       console.log("Generated Component:", Component);
 
       if (!Component) {
-        throw new Error("No React component was found. Make sure your component is properly defined with a capital first letter.");
+        throw new Error("No React component was found. Make sure your component is exported as AIGeneratedWidget.");
       }
 
       // Set the component for rendering
@@ -253,155 +429,100 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({ cod
   };
 
   return (
-    <div className="renderer-container">
-      <button
-        className="render-button"
+    <Box className="renderer-container" sx={{ mb: 2 }}>
+      <Button
+        variant="contained"
+        color="primary"
         onClick={renderComponent}
         disabled={isLoading}
+        startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <CodeIcon />}
+        sx={{ mb: 2 }}
       >
-        {isLoading ? (
-          <>
-            <span className="loading-spinner-small" />
-            Rendering...
-          </>
-        ) : (
-          'Render Component'
-        )}
-      </button>
+        {isLoading ? 'Rendering...' : 'Render Component'}
+      </Button>
 
       {statusMessage && (
-        <div className="status-message success">
-          ✓ {statusMessage}
-        </div>
+        <Alert 
+          severity="success" 
+          icon={<CheckCircleOutlineIcon />}
+          sx={{ mb: 2 }}
+        >
+          {statusMessage}
+        </Alert>
       )}
 
       {error && (
-        <div className="render-error">
-          <div className="error-title">Error:</div>
-          <div className="error-message">
+        <Alert 
+          severity="error" 
+          sx={{ mb: 2 }}
+        >
+          <AlertTitle>Error</AlertTitle>
+          <Box sx={{ 
+            fontFamily: 'monospace', 
+            p: 1.5, 
+            bgcolor: 'rgba(0,0,0,0.04)', 
+            borderRadius: 1,
+            overflowX: 'auto',
+            mb: 1 
+          }}>
             {error}
-          </div>
-          <div className="error-tip">
+          </Box>
+          <Typography variant="body2" sx={{ mt: 1 }}>
             <strong>Tip:</strong> Check for syntax errors, unsupported imports, or undefined variables.
-          </div>
-        </div>
+            Make sure your component is exported as AIGeneratedWidget.
+          </Typography>
+        </Alert>
       )}
 
-      <div className="component-preview">
+      <Paper 
+        variant="outlined" 
+        sx={{ 
+          width: '100%',
+          minHeight: 200,
+          borderRadius: 1
+        }}
+      >
         {isLoading ? (
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
-            <p>Processing your component...</p>
-          </div>
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 200,
+            color: 'text.secondary'
+          }}>
+            <CircularProgress size={40} sx={{ mb: 2 }} />
+            <Typography variant="body2">Processing your component...</Typography>
+          </Box>
         ) : DynamicComponent ? (
-          <div className="rendered-component">
-            <DynamicComponent />
-          </div>
+          <Box sx={{ p: 2 }}>
+            <ThemeProvider theme={darkTheme}>
+              <Box sx={{ bgcolor: 'background.default', p: 2, borderRadius: 1 }}>
+                <DynamicComponent />
+              </Box>
+            </ThemeProvider>
+          </Box>
         ) : (
-          <div className="empty-renderer">
-            <div className="react-icon">⚛️</div>
-            <p>No component rendered yet. Click the button above to render your component.</p>
-            <p className="renderer-hint">
-              Supports React components with imports, useState, useEffect, and more!
-            </p>
-          </div>
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 200,
+            color: 'text.secondary',
+            p: 2
+          }}>
+            <Typography variant="h4" sx={{ color: 'primary.main', mb: 2 }}>⚛️</Typography>
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              No component rendered yet. Click the button above to render your component.
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Supports React components with Material-UI integration!
+            </Typography>
+          </Box>
         )}
-      </div>
-
-      <style>
-        {`
-        /* These styles are needed for animation, will be moved to App.css */
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        
-        .renderer-container {
-          margin-bottom: 1rem;
-        }
-        
-        .render-button {
-          background-color: #3b82f6;
-          color: white;
-          font-weight: 500;
-          padding: 0.625rem 1.5rem;
-          border: none;
-          border-radius: 6px;
-          font-size: 0.875rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s ease;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-          margin-bottom: 1rem;
-        }
-        
-        .render-button:hover:not(:disabled) {
-          background-color: #2563eb;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 6px rgba(37, 99, 235, 0.1);
-        }
-        
-        .render-button:disabled {
-          background-color: #94a3b8;
-          cursor: not-allowed;
-        }
-        
-        .loading-spinner-small {
-          display: inline-block;
-          width: 16px;
-          height: 16px;
-          border: 2px solid rgba(255,255,255,0.3);
-          border-radius: 50%;
-          border-top-color: #fff;
-          animation: spin 1s linear infinite;
-          margin-right: 8px;
-        }
-        
-        .error-title {
-          font-weight: 600;
-          margin-bottom: 8px;
-        }
-        
-        .error-message {
-          font-family: 'JetBrains Mono', monospace;
-          padding: 12px;
-          background-color: rgba(0,0,0,0.1);
-          border-radius: 6px;
-          overflow-x: auto;
-          margin-bottom: 8px;
-          white-space: pre-wrap;
-        }
-        
-        .error-tip {
-          font-size: 13px;
-          padding-top: 8px;
-        }
-        
-        .empty-renderer {
-          text-align: center;
-          color: #64748b;
-          padding: 2rem;
-        }
-        
-        .react-icon {
-          font-size: 48px;
-          margin-bottom: 1rem;
-        }
-        
-        .renderer-hint {
-          font-size: 13px;
-          color: #94a3b8;
-          margin-top: 12px;
-        }
-        
-        .rendered-component {
-          width: 100%;
-          padding: 1rem;
-        }
-        `}
-      </style>
-    </div>
+      </Paper>
+    </Box>
   );
 };
 
